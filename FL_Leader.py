@@ -89,6 +89,7 @@ class LeaderRpcService(fl_pb2_grpc.Leader):
         config_dict = helper.convert_proto_to_dict(request)
 
         FL_Service = config_dict['FL_Service']
+        Aggregation_Method = config_dict['Aggregation_Method']
         # ====== Participate_Info ======
         self.leader.simulate = helper.bool_default(FL_Service, 'simulate')
         end_condition = helper.list_default(FL_Service, 'end_condition', '5, 99')
@@ -116,12 +117,11 @@ class LeaderRpcService(fl_pb2_grpc.Leader):
         (x_train, y_train), self.leader.test_data = load_dataset(self.leader.dataset)
 
         # ====== Aggregation_method_Info ======
-        self.leader.hybrid = helper.bool_default(FL_Service, 'hybrid')
-        self.leader.total_agg_method = helper.list_default(FL_Service, 'agg_method_1', 'Fedavg')
-        agg_method = helper.list_default(FL_Service, 'agg_method', 'Fedavg, 100')
-        add_agg_method1 = helper.list_default(FL_Service, 'add_agg_method1', ',')
-        add_agg_method2 = helper.list_default(FL_Service, 'add_agg_method2', ',')
-        agg_method = helper.list_default(FL_Service, 'agg_method', 'Fedavg, 100')
+        self.leader.hybrid = helper.bool_default(Aggregation_Method, 'hybrid')
+        self.leader.total_agg_method = helper.list_default(Aggregation_Method, 'agg_method_1', 'Fedavg')
+        agg_method = helper.list_default(Aggregation_Method, 'agg_method', 'Fedavg, 100')
+        add_agg_method1 = helper.list_default(Aggregation_Method, 'add_agg_method1', ',')
+        add_agg_method2 = helper.list_default(Aggregation_Method, 'add_agg_method2', ',')
         self.leader.agg_method = agg_method[0]
         self.leader.basic_method = agg_method[0]
         self.leader.agg_param = int(agg_method[1])
@@ -129,9 +129,9 @@ class LeaderRpcService(fl_pb2_grpc.Leader):
         self.leader.add_agg_param1 = helper.default(int, add_agg_method1[1], 30)
         self.leader.add_agg_method2 = helper.default(str, add_agg_method2[0], None)
         self.leader.add_agg_param2 = helper.default(int, add_agg_method2[1], 30)
-        self.leader.adaptive_agg_method = helper.str_default(FL_Service, 'adaptive_agg_method', 'no_adapt')
-        self.leader.adaptive_parameter = helper.int_default(FL_Service, 'adaptive_parameter', 40)
-        self.leader.eval_batch = helper.int_default(FL_Service, 'evaluation_batch_size', 64)
+        self.leader.adaptive_agg_method = helper.str_default(Aggregation_Method, 'adaptive_agg_method', 'no_adapt')
+        self.leader.adaptive_parameter = helper.int_default(Aggregation_Method, 'adaptive_parameter', 40)
+        self.leader.eval_batch = helper.int_default(Aggregation_Method, 'evaluation_batch_size', 64)
 
         # ====== Simulator_Info ======
         # Only when the simulate parameter is True
@@ -400,13 +400,14 @@ class FlLeader:
         mec_index = []
         max_increase = -float('inf')
         max_index = None
+        order=0
         # 현재 리더에 등록된 aggregator 중 모델(weight)을 가졌는지 확인
         for k, _aggregator in self.registered_aggregators.items():
             if f"{fl_round}" not in _aggregator:
                 print(f"[Leader] [{fl_round} Round] aggregator {_aggregator['id']}'s MEC model does not exist!")
                 pass
             lws.append(_aggregator[f"{fl_round}"]) #lws 리스트에 해당 라운드의 파라미터를 append한다
-            mec_index.append(k)
+            mec_index.append(order)
             print(f'[테스트] : {mec_index}')
         # 하이브리드 Aggregation Method를 사용하면,
         # 입력한 aggregation method의 적용 결과를 확인해 가장 좋은 성능을 보인 Method를 적용한다.
@@ -430,23 +431,20 @@ class FlLeader:
         # 하이브리드 Aggregation Method를 사용하지 않으면,
         # 입력한 aggregation method(첫번째 Method)의 가중치를 적용한다.
         else:
-            method = self.agg_method[0]
-            agg_ratio = helper.calc_avg_ratio(self.test_data, self.global_model, method, lws, mec_index, self.num_aggs_data)
-            agg_ratio = helper.average_model(lws, agg_ratio)
-        print(f"[Leader] [{fl_round} Round] Aggregate by {self.agg_method[max_index]} Method\n")
-        '''agg_ratio = helper.calc_avg_ratio(self.test_data, self.global_model, self.agg_method, lws, mec_index, self.num_aggs_data)
-        ratio_weight = [self.add_agg_param1, self.add_agg_param2]
-        for k, method in enumerate([self.add_agg_method1, self.add_agg_method2]):
-            if method != None:
-                ratio_avg = helper.calc_avg_ratio(self.test_data, self.global_model, method, lws, mec_index, self.num_aggs_data)
-                ratio_avg = np.array(ratio_avg) * ratio_weight[k] / 100
-                agg_ratio = np.vstack((agg_ratio, ratio_avg)) 
-                agg_ratio = np.sum(agg_ratio, axis=0)'''
-        
+            agg_ratio = helper.calc_avg_ratio(self.test_data, self.global_model, self.agg_method, lws, mec_index, self.num_aggs_data)
+            ratio_weight = [self.add_agg_param1, self.add_agg_param2]
+            for k, method in enumerate([self.add_agg_method1, self.add_agg_method2]):
+                if method != None:
+                    ratio_avg = helper.calc_avg_ratio(self.test_data, self.global_model, method, lws, mec_index, self.num_aggs_data)
+                    ratio_avg = np.array(ratio_avg) * ratio_weight[k] / 100
+                    agg_ratio = np.vstack((agg_ratio, ratio_avg)) 
+                    agg_ratio = np.sum(agg_ratio, axis=0)
+        print(f"[Leader] [{fl_round} Round] Aggregate by {self.agg_method} Method")
+
         gw = helper.average_model(lws, agg_ratio)
         self.global_model.set_weights(gw)
         lws.clear()
-        agg_ratio.clear()
+        #agg_ratio.clear()
 
     # aggregation method를 특정 상황에서 적용하는 방법
     def change_agg_method(self, module, round, acc):

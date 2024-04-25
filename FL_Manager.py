@@ -187,7 +187,6 @@ class ConfigService(fl_pb2_grpc.ConfigServiceServicer):
     def SendConfig(self, request, context):
         print(f'[Manager] Request (Client:{context.peer()[5:]})')
         manager_dict = proto_to_dict(request, ['FL_Service'])
-        print(f'[Manager] manager_dict:\n {manager_dict}')
         
         n_leader, n_agg, n_user, n_userset, simulate, ipfs, top_weight_save_percent, learning_layer_mode = self.extract_config_values(manager_dict)
 
