@@ -1,0 +1,23 @@
+# ipfs를 구동하기 위한 dockerfile 
+# 현재는 로컬에서 도커를 통하여 작동
+
+FROM ubuntu:20.04
+
+WORKDIR /
+
+# Install required packages and create download directory
+RUN apt-get update && \
+    apt-get -y install net-tools iputils-ping wget vim && \
+    mkdir /download /scripts
+
+# Install IPFS
+WORKDIR /download
+RUN wget https://dist.ipfs.io/go-ipfs/v0.7.0/go-ipfs_v0.7.0_linux-amd64.tar.gz && \
+    tar xvf go-ipfs_v0.7.0_linux-amd64.tar.gz && \
+    /download/go-ipfs/install.sh
+
+# Copy scripts
+COPY ./IPFS_setting.sh /scripts
+
+WORKDIR /scripts
+CMD sh IPFS_setting.sh

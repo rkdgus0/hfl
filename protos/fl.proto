@@ -1,0 +1,227 @@
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Run the command bellow at upper directory to compile this proto file
+// python -m grpc_tools.protoc -I./protos --python_out=. --pyi_out=. --grpc_python_out=. ./protos/fl.proto
+
+syntax = "proto3";
+
+// option java_multiple_files = true;
+// option java_package = "io.grpcExample.examples.helloworld";
+// option java_outer_classname = "HelloWorldProto";
+// option objc_class_prefix = "HLW";
+
+package fl;
+
+import "google/protobuf/empty.proto";
+
+message Section {
+  map<string, string> options = 1;
+}
+
+message Config {
+  map<string, Section> sections = 1;
+}
+
+message ReturnConfigMsg{
+  string ret_msg = 1;
+}
+
+service ConfigService {
+  rpc SendConfig (Config) returns (ReturnConfigMsg){}
+}
+
+
+service Manager {
+// For Register
+  rpc RegisterLeader (AddressMsg) returns (ReturnMsg) {}
+  rpc RegisterAggregator (AddressMsg) returns (ReturnMsg) {}
+  rpc RegisterUserSet (AddressMsg) returns (ReturnMsg) {}
+  
+  rpc ReportFinalResults (FinalResultsMsg) returns (ReturnMsg) {}
+  rpc ReturnCondition (ConditionMsg) returns (ReturnMsg) {}
+  }
+
+
+service Leader {
+
+  // For Aggregator
+  rpc RegisterAggregator (AddressMsg) returns (ReturnMsg) {}
+  rpc ReturnMecModel (ModelMsg) returns (ReturnMsg) {}
+
+  rpc ConfigSending (Config) returns (google.protobuf.Empty);
+}
+
+service Aggregator {
+  // For Leader
+  rpc RequestMecModel (ModelMsg) returns (ReturnMsg) {}
+
+  // For Userset
+  rpc RegisterUserSet (AddressSetMsg) returns (ReturnMsg) {} 
+  rpc ReturnUserModelSet (ModelSetMsg) returns (ReturnMsg) {} 
+
+  rpc ConfigSending (Config) returns (google.protobuf.Empty);
+}
+
+service UserSet {
+  // For Aggregator
+  rpc RequestUserModelSet (ReqUserModelSetMsg) returns (ReturnSetMsg) {}
+  rpc ConfigSending (Config) returns (google.protobuf.Empty);
+}
+
+enum ModelTypes {
+  MODEL_TYPES_GLOBAL = 0;
+  MODEL_TYPES_MEC = 1;
+  MODEL_TYPES_USER = 2;
+}
+
+message BasicMsg {
+  bool none = 1;
+}
+
+message FinalResultsMsg {
+  int32 g_round =1;
+  float accuracy = 2;
+  float loss = 3;
+  int32 num_aggs =4;
+  float elapsed_time =5; 
+}
+
+message ConditionMsg {
+  string id = 1;
+  string exp_name = 2;
+  bool condition = 3;
+}
+
+message AddressMsg {
+  string id = 1;
+  string ip = 2;
+  string port = 3;
+}
+message AddressSetMsg {
+  repeated AddressMsg address_set = 1;
+}
+
+
+message ModelMsg {
+  AddressMsg sender_addr = 1;
+  int32 fl_round = 2;
+  repeated bytes model_layers = 3;
+  repeated string model_layers_shape = 4;
+  optional int32 num_trained_data = 5;
+  repeated int32 num_trained_data_per_label = 6;
+  repeated int32 num_epoch = 7;
+  string model_hash = 8;
+  optional int32 mec_index = 9;
+  optional int32 userset_index = 10;
+  optional float current_accuracy = 11;
+  optional bool finish = 12;
+}
+message ModelSetMsg {
+  repeated ModelMsg model_set = 1;
+}
+message ReqUserModelSetMsg {
+  ModelMsg model = 1;
+  repeated AddressMsg address_set = 2;
+
+  // foo 를 1로 채우고 
+  int32 foo = 3;
+}
+
+//message MecFlInitMsg {
+//  bool accepted = 1;
+//  AddressMsg sender_addr = 2;
+//  int32 fl_round = 3;
+//  int32 num_mecs = 4;
+//  int32 mec_index = 5;
+//  int32 uset_index = 6;
+//  int32 num_total_users = 7;
+//  bool is_iid = 8;
+//}
+
+
+message ReturnMsg {
+  bool accepted = 1;
+  AddressMsg sender_addr = 2;
+  int32 fl_round = 3;
+  int32 num_trained_data = 4;
+  optional float current_accuracy = 5;
+}
+message ReturnSetMsg {
+  repeated ReturnMsg return_set = 1;
+}
+
+
+
+//
+//
+//message AddressInfo {
+//  uint32 round = 1;
+//  repeated bytes model_layers = 2;
+//  repeated string model_layers_shape = 3;
+//}
+//
+//message LocalTrainingAllocResp {
+//  uint32 round = 1;
+//  string client_id = 2;
+//  bool accepted = 3;
+//}
+//
+//message LocalTrainingResultReq {
+//  uint32 round = 1;
+//  string client_id = 2;
+//  repeated bytes model_layers = 3;
+//  repeated string model_layers_shape = 4;
+//}
+//
+//message LocalTrainingResultResp {
+//  uint32 round = 1;
+//  bool result = 2;
+//}
+//
+//message UserRegistrationReq {
+//  string id = 1;
+//  string name = 2;
+//  string ip = 3;
+//  string port = 4;
+//
+//}
+//
+//message UserRegistrationResp {
+//  bool accepted = 1;
+//  string server_id = 2;
+//  string server_name = 3;
+//  string server_ip = 4;
+//}
+//
+//message UserInfoReq {
+//  bool none = 1;
+//}
+//message MecInfoReq {
+//  bool none = 1;
+//}
+//message GlobalMecInfoReq {
+//  bool none = 1;
+//}
+//
+//message UserInfo {
+//  uint32 num_participation = 1;
+//  repeated uint32 num_labels = 2;
+//}
+//message MecInfo{
+//  repeated UserInfo users_info = 1;
+//}
+//message GlobalMecInfo {
+//  repeated MecInfo mecs_info = 1;
+//}
