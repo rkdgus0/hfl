@@ -117,18 +117,7 @@ class LeaderRpcService(fl_pb2_grpc.Leader):
 
         # ====== Aggregation_method_Info ======
         self.leader.hybrid = helper.bool_default(FL_Service, 'hybrid')
-        self.leader.total_agg_method = helper.list_default(FL_Service, 'agg_method_1', 'Fedavg')
-        agg_method = helper.list_default(FL_Service, 'agg_method', 'Fedavg, 100')
-        add_agg_method1 = helper.list_default(FL_Service, 'add_agg_method1', ',')
-        add_agg_method2 = helper.list_default(FL_Service, 'add_agg_method2', ',')
-        agg_method = helper.list_default(FL_Service, 'agg_method', 'Fedavg, 100')
-        self.leader.agg_method = agg_method[0]
-        self.leader.basic_method = agg_method[0]
-        self.leader.agg_param = int(agg_method[1])
-        self.leader.add_agg_method1 = helper.default(str, add_agg_method1[0], None)
-        self.leader.add_agg_param1 = helper.default(int, add_agg_method1[1], 30)
-        self.leader.add_agg_method2 = helper.default(str, add_agg_method2[0], None)
-        self.leader.add_agg_param2 = helper.default(int, add_agg_method2[1], 30)
+        self.leader.agg_method = helper.list_default(FL_Service, 'agg_method', 'Fedavg')
         self.leader.adaptive_agg_method = helper.str_default(FL_Service, 'adaptive_agg_method', 'no_adapt')
         self.leader.adaptive_parameter = helper.int_default(FL_Service, 'adaptive_parameter', 40)
         self.leader.eval_batch = helper.int_default(FL_Service, 'evaluation_batch_size', 64)
@@ -191,7 +180,7 @@ class FlLeader:
 
         return SERVER(self.base_model, mecs, self.num_target_collecting, self.agg_delay,
                       self.test_data, self.delay_method, self.eval_batch, self.hybrid, 
-                      self.delay_range, self.total_agg_method, self.delay_epoch, 
+                      self.delay_range, self.agg_method, self.delay_epoch, 
                       self.local_epoch ,self.model_decay, num_mec_datas)
     
     # ====== Aggregator compose (Simulator용 함수) ======
@@ -400,14 +389,16 @@ class FlLeader:
         mec_index = []
         max_increase = -float('inf')
         max_index = None
+        idx = 0
         # 현재 리더에 등록된 aggregator 중 모델(weight)을 가졌는지 확인
         for k, _aggregator in self.registered_aggregators.items():
             if f"{fl_round}" not in _aggregator:
                 print(f"[Leader] [{fl_round} Round] aggregator {_aggregator['id']}'s MEC model does not exist!")
                 pass
             lws.append(_aggregator[f"{fl_round}"]) #lws 리스트에 해당 라운드의 파라미터를 append한다
-            mec_index.append(k)
-            print(f'[테스트] : {mec_index}')
+            mec_index.append(idx)
+            idx += 1
+            #print(f'[테스트] : {mec_index}')
         # 하이브리드 Aggregation Method를 사용하면,
         # 입력한 aggregation method의 적용 결과를 확인해 가장 좋은 성능을 보인 Method를 적용한다.
         if self.hybrid:
@@ -427,13 +418,15 @@ class FlLeader:
                     agg_ratio = copy.deepcopy(sub_w)
                 del sub_model
                 sub_w.clear()
+            print(f"[Leader] [{fl_round} Round] Aggregate by {self.agg_method[max_index]} Method\n")
         # 하이브리드 Aggregation Method를 사용하지 않으면,
         # 입력한 aggregation method(첫번째 Method)의 가중치를 적용한다.
         else:
             method = self.agg_method[0]
             agg_ratio = helper.calc_avg_ratio(self.test_data, self.global_model, method, lws, mec_index, self.num_aggs_data)
-            agg_ratio = helper.average_model(lws, agg_ratio)
-        print(f"[Leader] [{fl_round} Round] Aggregate by {self.agg_method[max_index]} Method\n")
+            #agg_ratio = helper.average_model(lws, agg_ratio)
+            #print(f"[테스트] agg_ratio : {agg_ratio}")
+
         '''agg_ratio = helper.calc_avg_ratio(self.test_data, self.global_model, self.agg_method, lws, mec_index, self.num_aggs_data)
         ratio_weight = [self.add_agg_param1, self.add_agg_param2]
         for k, method in enumerate([self.add_agg_method1, self.add_agg_method2]):
@@ -519,7 +512,7 @@ if __name__ == '__main__':
             
             wandb.init(project="ETRI_exp", mode='online', group=flLeader.group_name, entity=f'{wandb_ID}', name=f"{flLeader.exp_name}_simul_'{flLeader.simulate}'_agg_{flLeader.num_target_collecting}_user_{flLeader.num_user}")
             wandb.config.update({'exp' : flLeader.exp_name, 'simulation' : flLeader.simulate, 'n_agg' : flLeader.num_target_collecting, 'n_user' : flLeader.num_user,
-                                'model' : flLeader.model, 'optimizer' : flLeader.optimizer, 'dataset' : flLeader.dataset, 'fraction' : flLeader.fraction, 'total_aggregation_method' : flLeader.total_agg_method, 'aggregation_method' : flLeader.agg_method, 
+                                'model' : flLeader.model, 'optimizer' : flLeader.optimizer, 'dataset' : flLeader.dataset, 'fraction' : flLeader.fraction, 'total_aggregation_method' : flLeader.agg_method, 'aggregation_method' : flLeader.agg_method, 
                                 'additional_method1' : flLeader.add_agg_method1, 'additional_method2' : flLeader.add_agg_method2, 'adaptive_agg_method' : flLeader.adaptive_agg_method, 
                                 'adaptive_parameter' : flLeader.adaptive_parameter})
         # get Test dataset

@@ -384,9 +384,9 @@ class FlManager:
             config.add_section(section)
         config[section].update({'id': key[0], 'ip': key[1], 'port': key[2]})
     
-    def print_network_to_file(self, file_path):
+    def print_network_to_file(self, file_name):
         config = configparser.ConfigParser()
-        config.read('config/fl_net_config.ini')
+        config.read(f'config/{file_name}.ini')
         # leader 정보 추가
         for k, leader in enumerate(self.registered_leader_info):
             self.set_network_info(config, 'leader', leader, k)
@@ -396,7 +396,7 @@ class FlManager:
         # userset 정보 추가
         for k, userset in enumerate(self.registered_userset_info):
             self.set_network_info(config, 'userset', userset, k)
-        with open(file_path, 'w', encoding='utf-8') as file:
+        with open(f'config/{file_name}.ini', 'w', encoding='utf-8') as file:
             config.write(file)
     
     # ===== RPC server =====
@@ -423,7 +423,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--manager_ip', dest='manager_ip', action='store',
                         type=str, help='<manager ip>:<port>')
     parser.add_argument('-f', '--file_name', dest='file_name', action='store', type=str,   
-                        default='config/fl_net_config.ini', help="fl network config를 저장하기 위한 파일 [경로]이름")
+                        default='fl_net_config', help="fl network config를 저장하기 위한 파일 [경로]이름")
     parser.add_argument('-l', '--loop_time', dest='loop', action='store', type=int, default=5)
     args = parser.parse_args()
     
@@ -441,12 +441,12 @@ if __name__ == '__main__':
     loop = args.loop
     
     config = configparser.ConfigParser()
-    file_path = args.file_name  #서비스 네트워크를 저장하는 파일
-    with open(file_path, 'w', encoding='utf-8') as file:
+    file_name = args.file_name  #서비스 네트워크를 저장하는 파일
+    with open(f'config/{file_name}.ini', 'w', encoding='utf-8') as file:
         config.write(file)
     #TODO 기존 파일 존재할때 Overwrite 또는 네트워크 복원 관련 기능 추가 필요
     
-    print(f"{LOG_HEAD} (ip={my_ip}:{my_port}, refresh={loop}, net_file={file_path})", flush=True)
+    print(f"{LOG_HEAD} (ip={my_ip}:{my_port}, refresh={loop}, net_file={file_name})", flush=True)
     # Initialize Manager
     flmanager = FlManager()
     flmanager.info = my_ip + ':' + str(my_port)
@@ -456,7 +456,7 @@ if __name__ == '__main__':
 
     while True:
         #TODO 변경이 발생한 경우만 기록되도록 변경 필요
-        flmanager.print_network_to_file(file_path)
+        flmanager.print_network_to_file(file_name)
         #flmanager.print_network()
         t = time.localtime()
         current_time = time.strftime("%Y.%m.%d %H:%M:%S", t)
