@@ -16,7 +16,7 @@ NUM_USERSET=1
 
 # FL_Manager.py 실행
 echo "Starting HFL! (Leader: $NUM_LEADER, Aggregator: $NUM_AGG, Userset: $NUM_USERSET)"
-python3 FL_Manager.py -m "$manager_address" -f "$net_config_name" &
+python3 FL_Manager.py -m "$manager_address" -f "$net_config_name" 1> Logs/manager.log 2>&1 &
 sleep $SLEEP_TIME
 
 # FL_Leader.py 실행
@@ -24,7 +24,7 @@ sleep $SLEEP_TIME
 for ((i=0; i<$NUM_LEADER; i++))
 do
     port=$((50000+i))
-    python3 FL_Leader.py -i "leader$i" -p "$port" -m "$manager_address" &
+    python3 FL_Leader.py -i "leader$i" -p "$port" -m "$manager_address" 1> Logs/leader$i.log 2>&1 &
 done
 sleep $SLEEP_TIME
 
@@ -32,7 +32,7 @@ sleep $SLEEP_TIME
 for ((i=0; i<$NUM_AGG; i++))
 do
     port=$((50050+i))
-    python3 FL_Aggregator.py -i "aggregator$i" -p "$port" -m "$manager_address" > /dev/null 2>&1 &
+    python3 FL_Aggregator.py -i "aggregator$i" -p "$port" -m "$manager_address" 1> Logs/aggregator$i.log 2>&1 &
 done
 sleep $SLEEP_TIME
 
@@ -40,12 +40,12 @@ sleep $SLEEP_TIME
 for ((i=0; i<$NUM_USERSET; i++))
 do
     port=$((50100+n))
-    python3 FL_UserSet.py -i "userset$i" -p "$port" -m "$manager_address" > /dev/null 2>&1 &
+    python3 FL_UserSet.py -i "userset$i" -p "$port" -m "$manager_address" 1> Logs/userset$i.log 2>&1 &
 done
 sleep $SLEEP_TIME
 
 # FL_Client.py 실행
-python3 FL_Client.py -m "$manager_address" -f "$config_name" &
+python3 FL_Client.py -m "$manager_address" -f "$config_name" 1> Logs/client.log 2>&1&
 
 wait
 echo "Experiments completed!"

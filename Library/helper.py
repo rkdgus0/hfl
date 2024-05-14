@@ -96,6 +96,7 @@ def make_id(type, ip, port):
     id = ty + '_' + ip[idx+1:] + '_' + port
     return id
 
+#TODO: 이전의 ETRI 코드에서 사용하던 파라미터 송/수신 코드 -> 지워야하나?
 def serialize_param_service(leader, aggregator, user, userset, simul, end_condition):
     p_str = ''
     p_str = p_str + str(leader) + ',' + str(aggregator) + ',' + str(user) + ',' + str(userset)

@@ -196,13 +196,11 @@ def diri_split_data(x_train, y_train, n_user, alpha):
         np.random.shuffle(t_idx_k) #해당 클래스의 Random Index
 
         prop = np.random.dirichlet(np.repeat(alpha, n_user))
-        #print(f'디리클레 분포 : {prop}')
         #alpha값을 유저수만큼 복사한 리스트 [0.1, 0.1, 0.1, ..., 0.1]을 dirichlet 함수에 넣는다
         #dirichlet() : 전체합이 1이면서, 길이는 input 리스트의 길이와 같은 리스트를 배출한다.
         #alpha의 값이 클수록 분포가 bias되는 경향이 있다. -> 그래서 default값은 0.1 (편향 분포를 위해서)
 
         t_prop = (np.cumsum(prop) * len(t_idx_k)).astype(int)[:-1]
-        #print(f'디리클레 분포 : {t_prop}')
         # np.cumsum : 리스트 방향으로 누적 합의 리스트 반출, ex. np.cumsum([[1,3],[5,6]]) = [1 4 9 15]
         # dirichlet 전체합이 1이니까, 리스트의 마지막 값은 t_idx_k의 길이이다.
 
@@ -230,6 +228,7 @@ def idx_slicer(t_idx_slice, idx_k, prop):
         #idx_j : 해당 유저의 idx_slice 위치
         #idx : 해당 유저에 라벨당 하나의 shard 부여
 
+# Random한 개수의 random 데이터
 def diff_split_data(x_train, y_train, n_user):
     x_datasets = [[] for _ in range(n_user)]
     y_datasets = [[] for _ in range(n_user)]
@@ -248,7 +247,7 @@ def diff_split_data(x_train, y_train, n_user):
     
     return x_datasets, y_datasets
 
-
+#TODO: random한 개수의 Non_iid 데이터 split method인데, 아직 미완성 -> 신경 안써도 될듯?
 def ran_non_iid_split_data(x_train, y_train, n_user):
     x, y = x_train, y_train
 
