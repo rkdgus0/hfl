@@ -5,14 +5,14 @@ cd ../
 
 # Init Parameter
 SLEEP_TIME=5
-
 manager_address="10.20.22.107:8888"
 config_name="fl_config_simul"
 net_config_name="fl_net_config"
-NUM_LEADER=1
-NUM_AGG=1
-NUM_USERSET=1
 
+# Num of Component
+NUM_LEADER=$(grep -Po "(?<=leader = ).*" "config/$config_name.ini")
+NUM_AGG=$(grep -Po "(?<=aggregator = ).*" "config/$config_name.ini")
+NUM_USERSET=$(grep -Po "(?<=userset = ).*" "config/$config_name.ini")
 
 # FL_Manager.py 실행
 echo "Starting HFL! (Leader: $NUM_LEADER, Aggregator: $NUM_AGG, Userset: $NUM_USERSET)"
