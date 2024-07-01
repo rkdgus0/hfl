@@ -4,16 +4,6 @@ It provides basic FL functions such as FL network configuration, users' data dis
 and provides statistical information such as real-time FL performance monitoring and blockchain-based FL history analysis.
 It also provides additional functions such as performance evaluation method, user selection policy and model aggregation policy.
 
-## Related Project
-Project Name: ABC (MEC-Based AI-converged BlockChain)
-
-Project Leader:  DongOh Kim (dokim@etri.re.kr)
-
-Project Members: Heesang Jin (jinhs@etri.re.kr), JongDae Park (parkjd@etri.re.kr)
-
-Project period:  2022.04.01 ~ 2024.12.31
-
-
 ## Requirements
 We tested in the environment below.
 
@@ -34,49 +24,19 @@ Python: 3.10.6
 
 Tensorflow: 2.12.0
 
-### Hardware
-CPU: 2x Intel Xeon Gold 6326 2.9G
-
-SSD: 1.92 TB
-
-Memory: 256GB
-
-GPU: A40(46GB), P100(16GB), T4(16GB)
-
-Network: 1Gb ethernet switch
-
-
 ## Getting started
-Current main code is in 'RemoteVersion' directory.
+
 ```
-$ cd RemoteVersion
+conda create -n hfl python=3.10.6
+conda activate hfl
+git clone https://github.com/rkdgus0/hfl.git
+cd hfl
+pip install -r tf_requirements.txt
+pip install -r requirements.txt
+bash experiments/run.sh
 ```
 
-Run an aggregator first.
-```
-$ python3 FL_Aggregator.py -num_total_users 4 -my_port 50081 -round 10
-```
-
-Run two usersets each which simulates two users, so total four users will begin.
-```
-$ python3 FL_UserSet.py -uset_index 0 -num_total_users 4 -num_users 2 -my_port 50101 -agg_port 50081
-$ python3 FL_UserSet.py -uset_index 1 -num_total_users 4 -num_users 2 -my_port 50102 -agg_port 50081
-```
-Done!
-
-If you increase the number of users to 12, set '-num_total_users' to '12' and set '-num_users' of both usersets to '6'.
-
-Of course, you can also run 12 users by starting six userset processes each with '-num_users 2'. 
-
-## FL information RPC server
-Aggregator provides RPC server for getting FL information.
-
-When FL is running, you should run the "interpreter" as bellow.
-```
-$ python3 interpreter.py -addr localhost:50081
-```
-
-Done!
+All the log will be saved in ```Logs``` folder.
 
 ## Execution parameters
 ### Aggregator (FL_Aggregator.py)
@@ -169,15 +129,11 @@ FL processes are creating log files.
 If you want to track logs of the FL processes,
 use the 'tail' command at the server the FL processes is running. 
 ```
-$ tail -f logs/aggregator.log
-$ tail -f logs/userset1.log
-$ tail -f logs/userset2.log
-$ tail -f logs/userset3.log
+$ tail -f Logs/aggregator.log
+$ tail -f Logs/userset1.log
+$ tail -f Logs/userset2.log
+$ tail -f Logs/userset3.log
 ```
-
-
-## Authors
-Heesang Jin (jinhs@etri.re.kr)
 
 ## License
 For open source projects, say how it is licensed.
