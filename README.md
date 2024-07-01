@@ -24,7 +24,6 @@ All the log will be saved in ```Logs``` folder.
 | `-my_port`         | string |                 | "50081"      | port number of the aggregator                                       |
 | `-hfl`             | bool   | True, False     | False        | ON/OFF for Hierarchical FL                                          |
 | `-num_total_users` | int    | 1~              | 4            | the number users in the MEC (not userset)                           |
-|--------------------|--------|-----------------|-------------|------------------------------------------------------------------------------------------------|
 | `-epoch`           | int    | 1~              | 10          | the number of local training epochs                                                            |
 | `-agg_ip`          | string | xxx.xxx.xxx.xxx | "localhost" | IP of the aggregator to connect                                                                |
 | `-agg_port`        | string | xxxxx           | "50081"     | port of the aggregator to connect                                                              |
