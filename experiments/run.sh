@@ -3,8 +3,8 @@
 cd ../
 
 # Init Parameter
-SLEEP_TIME=5
-manager_address="10.20.22.83:8888"
+SLEEP_TIME=3
+manager_address="10.20.22.107:8888"
 config_name="fl_config"
 net_config_name="fl_net_config"
 
@@ -29,6 +29,7 @@ do
 done
 sleep $SLEEP_TIME
 
+
 # FL_Aggregator.py 실행
 for ((i=0; i<$NUM_AGG; i++))
 do
@@ -40,7 +41,7 @@ sleep $SLEEP_TIME
 # FL_UserSet.py 실행
 for ((i=0; i<$NUM_USERSET; i++))
 do
-    port=$((50100+n))
+    port=$((50100+i))
     python3 FL_UserSet.py -i "userset$i" -p "$port" -m "$manager_address" 1> Logs/userset$i.log 2>&1 &
 done
 sleep $SLEEP_TIME

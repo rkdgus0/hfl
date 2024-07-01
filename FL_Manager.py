@@ -70,13 +70,13 @@ class ManagerRpcService(fl_pb2_grpc.Manager):
         finish_condition = condition_msg.condition
         if finish_condition:
             for section in net_config.sections():
-                if config.get(section, 'id') == id:
+                if net_config.get(section, 'id') == id:
                     found_section = section
                     break
             num_used = net_config[found_section].getint('current_used')
             value = max(0, num_used - 1)
             net_config[found_section].update({'current_used' : f'{value}'})
-            print('\n'f'Exp : {exp_name} is finished! and {id} is reconnected!')
+            print(f'\n{LOG_HEAD} Exp : {exp_name} is finished! and {id} is reconnected!')
 
         with open('config/fl_net_config.ini', 'w', encoding='utf-8') as file:
             net_config.write(file)

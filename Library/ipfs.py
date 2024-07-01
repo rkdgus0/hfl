@@ -3,6 +3,7 @@ import os
 import random
 import copy
 import time
+import socket
 import tensorflow as tf
 from scipy.sparse import csr_matrix
 import numpy as np
@@ -11,8 +12,11 @@ class FL_IPFS():
     def __init__(self): 
         # Connect attempt ipfs and failure error output
         try:
-            self.ipfs = self.connect_to_ipfs('127.0.0.1')
-            print("Connected to IPFS successfully!")
+            self.ipfs = self.connect_to_ipfs(f'{socket.gethostbyname(socket.gethostname())}')
+            if self.ipfs is not None:
+                print("Connected to IPFS successfully!")
+            else:
+                print("Failed to connect to IPFS: IPFS connection is None.")
         except Exception as e:
             print("Failed to connect to IPFS:", str(e))
             self.ipfs = None
@@ -43,7 +47,7 @@ class FL_IPFS():
         return file_hash
     
     # Load model weights from files in IPFS
-    def load_model_weights_from_ipfs(model_weight_IPFS):
+    def load_model_weights_from_ipfs(self, model_weight_IPFS):
         loaded_weight_from_np = np.load(model_weight_IPFS, allow_pickle=True)  
         model_weights = [loaded_weight_from_np[layer_name] for layer_name in loaded_weight_from_np.files]
         return model_weights
