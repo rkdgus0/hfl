@@ -1,30 +1,4 @@
-# ETRI ABC project Federated Learning Simulator
-The simulator is Federated Learning (FL) simulator capable of single/hierarchical FL experiments.
-It provides basic FL functions such as FL network configuration, users' data distribution settings, and FL parmeter settings
-and provides statistical information such as real-time FL performance monitoring and blockchain-based FL history analysis.
-It also provides additional functions such as performance evaluation method, user selection policy and model aggregation policy.
-
-## Requirements
-We tested in the environment below.
-
-Please match the software version below.
-
-### Software
-OS: Ubuntu 22.04.1
-
-NVIDIA-driver: 515.65.01
-
-CUDA: 11.7
-
-cuDNN: 8.9.2
-
-Anaconda: 22.9.0
-
-Python: 3.10.6
-
-Tensorflow: 2.12.0
-
-## Getting started
+# Getting started
 
 ```
 conda create -n hfl python=3.10.6
