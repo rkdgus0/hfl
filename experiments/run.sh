@@ -1,18 +1,19 @@
 #!/bin/bash
 
-source activate hfl
 cd ../
 
 # Init Parameter
 SLEEP_TIME=5
-manager_address="10.20.22.107:8888"
-config_name="fl_config_simul"
+manager_address="10.20.22.83:8888"
+config_name="fl_config"
 net_config_name="fl_net_config"
 
 # Num of Component
 NUM_LEADER=$(grep -Po "(?<=leader = ).*" "config/$config_name.ini")
 NUM_AGG=$(grep -Po "(?<=aggregator = ).*" "config/$config_name.ini")
 NUM_USERSET=$(grep -Po "(?<=userset = ).*" "config/$config_name.ini")
+
+mkdir Logs
 
 # FL_Manager.py 실행
 echo "Starting HFL! (Leader: $NUM_LEADER, Aggregator: $NUM_AGG, Userset: $NUM_USERSET)"

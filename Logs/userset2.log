@@ -1,0 +1,18 @@
+2024-07-01 14:18:01.019451: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2024-07-01 14:18:01.022027: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+2024-07-01 14:18:01.080341: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+2024-07-01 14:18:01.080774: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-07-01 14:18:01.815175: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2024-07-01 14:18:03.413442: W tensorflow/core/common_runtime/gpu/gpu_device.cc:1956] Cannot dlopen some GPU libraries. Please make sure the missing libraries mentioned above are installed properly if you would like to use GPU. Follow the guide at https://www.tensorflow.org/install/gpu for how to download and setup the required libraries for your platform.
+Skipping registering GPU devices...
+1,FedAvg,100,test,50,100
+1,FedAvg,100,test,50,100
+2,FedAvg,50,FedAT,50,test,50,100
+2
+[['FedAvg', 50], ['FedAT', 50]]
+['test', 50]
+100
+1006632960
+Failed to connect to IPFS: ConnectionError: HTTPConnectionPool(host='127.0.0.1', port=5001): Max retries exceeded with url: /api/v0/version?stream-channels=true (Caused by NewConnectionError('<ipfshttpclient.requests_wrapper.HTTPConnection object at 0x7f6955022950>: Failed to establish a new connection: [Errno 111] Connection refused'))
+#HFL#[GlobalAggregator] (id=userset2, ip=127.0.1.1:50100, manager=10.20.22.83:8888)

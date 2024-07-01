@@ -288,10 +288,6 @@ print(aggs)
 print(change)
 print(fraction)
 
-mask = univ_4['학교명'].str.contains(univ_tool_6['학교명']) & (univ_4['본분교'] == univ_tool_6['본분교'])
-univ_4.loc[mask, '주소별 학교 코드'] = univ_tool_6['KEDI 학교코드']
-
-
 def deserialize_param_service(p_str):
     p_strs = p_str.split(',')
     leader = int(p_strs[0])
